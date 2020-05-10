@@ -1,0 +1,113 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+/**
+ * @def STANDARD_BASE 10
+ * @brief the standard base for which we convert each base to and from.
+ */
+#define STANDARD_BASE 10
+
+/**
+ * @def USER_INPUT_MESSAGE "%d^%d^%d^"
+ * @brief User input
+ */
+#define USER_INPUT "%d^%d^%d^"
+
+/**
+ * @def CONVERTED_BASE "%d\n"
+ * @brief the number after the conversion
+ */
+#define CONVERTED_BASE "%lu\n"
+
+/**
+ * Calculates a number to its exponential power.
+ * @param base the base number
+ * @param exponent the exponent for our base number
+ * @return the calculated number
+ */
+unsigned long power(unsigned long base, unsigned long exponent)
+{
+    unsigned long result, i;
+    result = 1;
+    for (i = 0; i < exponent; i++)
+    {
+        result *= base;
+    }
+    return result;
+}
+
+/**
+ * Counts the amount of digits in a number
+ * @param number the given number to check
+ * @return the number of digits in our number
+ */
+int digitCounter (unsigned long number)
+{
+    int counter = 0;
+    while (number != 0)
+    {
+        number /= 10;
+        ++counter;
+    }
+    return counter;
+}
+
+/**
+ * Converts an any base number to a number base 10
+ * @param number the number at the original base
+ * @param base the old base
+ * @return the number in base 10
+ */
+int convertToTen (unsigned long number, unsigned long base)
+{
+    int numberOfDigits = digitCounter(number);
+    int newNumber = 0;
+    for (int i=0; i<numberOfDigits; i++)
+    {
+        unsigned long remainder = number%10;
+        if (remainder >= base)
+        {
+            fprintf(stderr, "invalid!!\n");
+            exit(1);
+        }
+        newNumber += remainder *(power(base,i));
+        number/=10;
+    }
+    return newNumber;
+}
+
+/**
+ * Converts base 10 to any other base
+ * @param number the number given in base 10
+ * @param base the new base for which we'd like to convert
+ * @return returns the number in the new base
+ */
+unsigned long convertFromTen (int number, int base) {
+    unsigned long convertedBase = 0;
+    unsigned long index = 0;
+    while (number > 0) {
+        int remainder = number % base;
+        number /= base;
+        convertedBase += remainder * power(STANDARD_BASE, index);
+        index++;
+    }
+    return convertedBase;
+}
+
+/**
+ * Converts from any base to any base by converting to 10 and again from 10
+ * @param oldBase the old base
+ * @param newBase the new base
+ * @param number the number set form the old base
+ * @return the number set to the new base.
+ */
+unsigned long convertBasetoBase (int oldBase, int newBase, int number)
+{
+    int convertedNumber = convertToTen(number, oldBase);
+    return convertFromTen(convertedNumber, newBase);
+}
+
+int main()
+{
+    printf("%lu", convertBasetoBase(10,2,999999));
+}
